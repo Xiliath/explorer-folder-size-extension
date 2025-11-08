@@ -21,23 +21,21 @@ echo Uninstalling Folder Size Extension...
 echo.
 
 REM Set paths
-set INSTALL_DIR=%ProgramFiles%\FolderSizeExtension
-set DLL_NAME=FolderSizeExtension.dll
+set INSTALL_DIR=%ProgramFiles%\FolderSizeCalculator
+set EXE_NAME=FolderSizeCalculator.exe
 
 REM Check if installed
-if not exist "%INSTALL_DIR%\%DLL_NAME%" (
+if not exist "%INSTALL_DIR%\%EXE_NAME%" (
     echo Extension does not appear to be installed.
     echo Installation directory not found: %INSTALL_DIR%
     pause
     exit /b 1
 )
 
-REM Unregister the COM server
-echo Unregistering COM server...
-"%SystemRoot%\Microsoft.NET\Framework64\v4.0.30319\regasm.exe" /unregister "%INSTALL_DIR%\%DLL_NAME%"
-
-REM Alternatively, if SharpShell Server Registration Manager is available
-REM Use: srm uninstall "%INSTALL_DIR%\%DLL_NAME%"
+REM Remove context menu entries
+echo Removing context menu entries...
+cd /d "%~dp0"
+regedit /s RemoveFromContextMenu.reg
 
 REM Remove installation directory
 echo Removing installation files...

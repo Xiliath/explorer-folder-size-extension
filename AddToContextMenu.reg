@@ -1,0 +1,25 @@
+Windows Registry Editor Version 5.00
+
+; Add "Calculate Folder Size" to folder context menu
+[HKEY_CLASSES_ROOT\Directory\shell\CalculateFolderSize]
+@="Calculate Folder Size"
+"Icon"="%ProgramFiles%\\FolderSizeCalculator\\FolderSizeCalculator.exe,0"
+
+[HKEY_CLASSES_ROOT\Directory\shell\CalculateFolderSize\command]
+@="\"%ProgramFiles%\\FolderSizeCalculator\\FolderSizeCalculator.exe\" \"%1\""
+
+; Add "Calculate Folder Size (All Subfolders)" to folder context menu
+[HKEY_CLASSES_ROOT\Directory\shell\CalculateFolderSizeAll]
+@="Calculate Folder Size (All Subfolders)"
+"Icon"="%ProgramFiles%\\FolderSizeCalculator\\FolderSizeCalculator.exe,0"
+
+[HKEY_CLASSES_ROOT\Directory\shell\CalculateFolderSizeAll\command]
+@="\"%ProgramFiles%\\FolderSizeCalculator\\FolderSizeCalculator.exe\" \"%1\" --subfolders"
+
+; Add to Directory Background (right-click in empty space)
+[HKEY_CLASSES_ROOT\Directory\Background\shell\CalculateFolderSize]
+@="Calculate Folder Sizes Here"
+"Icon"="%ProgramFiles%\\FolderSizeCalculator\\FolderSizeCalculator.exe,0"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\CalculateFolderSize\command]
+@="\"%ProgramFiles%\\FolderSizeCalculator\\FolderSizeCalculator.exe\" \"%V\" --subfolders"

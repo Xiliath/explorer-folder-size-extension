@@ -1,0 +1,10 @@
+Windows Registry Editor Version 5.00
+
+; Remove "Calculate Folder Size" from folder context menu
+[-HKEY_CLASSES_ROOT\Directory\shell\CalculateFolderSize]
+
+; Remove "Calculate Folder Size (All Subfolders)" from folder context menu
+[-HKEY_CLASSES_ROOT\Directory\shell\CalculateFolderSizeAll]
+
+; Remove from Directory Background
+[-HKEY_CLASSES_ROOT\Directory\Background\shell\CalculateFolderSize]

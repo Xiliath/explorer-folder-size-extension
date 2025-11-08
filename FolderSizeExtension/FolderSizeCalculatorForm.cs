@@ -175,12 +175,12 @@ namespace FolderSizeExtension
 
                 // Display results
                 AppendResult($"Folder: {_folderPath}");
-                AppendResult($"Total Size: {FolderSizePropertyHandler.FormatSize(result.TotalSize)} ({result.TotalSize:N0} bytes)");
+                AppendResult($"Total Size: {FormatUtils.FormatSize(result.TotalSize)} ({result.TotalSize:N0} bytes)");
                 AppendResult($"Files: {result.FileCount:N0}");
                 AppendResult($"Folders: {result.FolderCount:N0}");
                 AppendResult($"Total Items: {result.TotalItemCount:N0}");
 
-                _statusLabel.Text = $"Complete - {FolderSizePropertyHandler.FormatSize(result.TotalSize)}";
+                _statusLabel.Text = $"Complete - {FormatUtils.FormatSize(result.TotalSize)}";
             }
         }
 
@@ -196,7 +196,7 @@ namespace FolderSizeExtension
             {
                 completedCount++;
                 string folderName = Path.GetFileName(tuple.folder);
-                string sizeStr = FolderSizePropertyHandler.FormatSize(tuple.result.TotalSize);
+                string sizeStr = FormatUtils.FormatSize(tuple.result.TotalSize);
 
                 AppendResult($"[{completedCount}/{totalCount}] {folderName}: {sizeStr}");
                 _statusLabel.Text = $"Processed {completedCount} of {totalCount} folders...";

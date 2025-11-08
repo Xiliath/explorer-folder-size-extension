@@ -1,39 +1,39 @@
-# Folder Size Extension for Windows Explorer
+# Folder Size Calculator for Windows Explorer
 
-A Windows Shell Extension that adds folder size calculation capabilities to Windows Explorer. This extension integrates directly into Windows Explorer, allowing you to calculate and view folder sizes through context menus and tooltips.
+A modern .NET 8 application that adds folder size calculation capabilities to Windows Explorer through context menu integration. Calculate folder sizes on-demand with a clean progress interface and persistent caching.
 
 ## Features
 
 - **Context Menu Integration**: Right-click on any folder to calculate its size
 - **Individual or Batch Calculation**: Calculate a single folder or all subfolders at once
 - **Persistent Cache**: Calculated sizes are cached and persist across sessions
-- **Progress Display**: Visual progress window shows calculation status
-- **Tooltip Integration**: Hover over folders to see cached size information
-- **Manual Trigger**: Sizes are only calculated when you explicitly request them (no performance impact on browsing)
+- **Progress Display**: Real-time progress window with cancellation support
+- **Manual Trigger**: Sizes are only calculated when you explicitly request them (no performance impact)
+- **Modern .NET 8**: Built on the latest LTS version of .NET
 
 ## Architecture
 
-The extension consists of several components:
+This is a standalone .NET 8 Windows Forms application that integrates with Explorer via Windows Registry context menu entries.
 
-1. **FolderSizeContextMenu**: Context menu handler for triggering calculations
-2. **FolderSizeCalculator**: Background calculation engine with cancellation support
-3. **FolderSizeCache**: Thread-safe persistent cache for storing results
-4. **FolderSizePropertyHandler**: Property handler for displaying sizes
-5. **FolderSizeColumnProvider**: Info tip provider for hover tooltips
-6. **FolderSizeCalculatorForm**: WinForms UI for displaying progress
+**Components:**
+1. **FolderSizeCalculator**: Background calculation engine with async/await support
+2. **FolderSizeCache**: Thread-safe JSON-based persistent cache
+3. **FolderSizeCalculatorForm**: WinForms UI for displaying progress
+4. **FormatUtils**: Utility functions for formatting file sizes
+5. **Registry Integration**: Context menu entries added via Windows Registry
 
 ## Requirements
 
 - Windows 10 or later
-- .NET Framework 4.8 (pre-installed on Windows 10/11)
+- .NET 8 Runtime (installed automatically with .NET 8 SDK, or download separately)
 - Administrator privileges for installation
 
 ## Building from Source
 
 ### Prerequisites
 
-- Visual Studio 2022 or later (with .NET desktop development workload)
-- .NET Framework 4.8 Developer Pack
+- .NET 8.0 SDK or later
+- Visual Studio 2022 (optional, can also build with command line)
 
 ### Build Steps
 
@@ -57,7 +57,7 @@ dotnet build FolderSizeExtension.sln -c Release
 3. Follow the on-screen instructions
 4. Windows Explorer will restart automatically
 
-The extension will be installed to: `C:\Program Files\FolderSizeExtension\`
+The application will be installed to: `C:\Program Files\FolderSizeCalculator\`
 
 ## Usage
 
@@ -65,33 +65,26 @@ The extension will be installed to: `C:\Program Files\FolderSizeExtension\`
 
 1. Open Windows Explorer and navigate to any folder
 2. Right-click on a folder you want to analyze
-3. Select **Calculate Folder Size** from the context menu
-4. Choose one of the options:
-   - **Calculate Size (This Folder)**: Calculate only the selected folder
-   - **Calculate Size (All Subfolders)**: Calculate all immediate subfolders
-5. A progress window will appear showing the calculation status
-6. Once complete, the size is cached
+3. Select one of the context menu options:
+   - **Calculate Folder Size**: Calculate only the selected folder
+   - **Calculate Folder Size (All Subfolders)**: Calculate all immediate subfolders
+4. A progress window will appear showing:
+   - Current folder being scanned
+   - Progress indicator
+   - Real-time results
+5. Click **Cancel** to stop calculation, or **Close** when done
+6. Results are automatically cached
 
-### Viewing Cached Sizes
+### Viewing Results
 
-After calculation, you can view folder sizes in two ways:
+Results are displayed in the progress window showing:
+- Total size in human-readable format (KB, MB, GB, TB)
+- Total byte count
+- Number of files
+- Number of folders
+- Total item count
 
-1. **Tooltips**: Hover your mouse over a folder to see a tooltip with:
-   - Folder size (human-readable format)
-   - Total item count
-   - Last calculation date
-
-2. **Details View** (Note: Requires additional registry configuration):
-   - Switch to Details view in Explorer
-   - Right-click column headers
-   - Add custom "Folder Size" column
-
-### Clearing Cache
-
-To clear cached sizes:
-1. Right-click on a folder
-2. Select **Calculate Folder Size** > **Clear Cached Sizes**
-3. Press F5 to refresh Explorer
+Cached results are stored persistently and can be retrieved by running the calculation again (it will complete instantly if already cached).
 
 ## Uninstallation
 
@@ -100,7 +93,8 @@ To clear cached sizes:
 3. Windows Explorer will restart automatically
 
 This will remove:
-- The extension DLL and COM registration
+- The application executable and dependencies
+- Registry context menu entries
 - Installation directory
 - Cache files from AppData
 
@@ -108,83 +102,94 @@ This will remove:
 
 ### How It Works
 
-1. **COM Shell Extension**: The extension is a COM server that integrates with Windows Explorer
-2. **Context Menu Handler**: Implements `IShellExtInit` and `IContextMenu` interfaces
-3. **Property System**: Uses Windows Property System for displaying data
+1. **Registry Integration**: Context menu entries are added to `HKEY_CLASSES_ROOT\Directory\shell`
+2. **Standalone Application**: .NET 8 WinExe that receives folder path as command-line argument
+3. **Async Calculation**: Uses `Task`-based async/await for non-blocking folder traversal
 4. **Cache Storage**: Stores calculated sizes in JSON format at `%APPDATA%\FolderSizeExtension\`
+5. **Error Handling**: Gracefully handles access denied errors for protected folders
 
 ### Performance Considerations
 
-- Calculations are **manual only** - no automatic calculations
-- Large folders may take several minutes to calculate
-- Calculations run in background threads with cancellation support
-- Cache is loaded once at startup and saved after each calculation
+- Calculations are **manual only** - no automatic calculations or background scanning
+- Large folders may take several minutes depending on size and file count
+- Calculations run asynchronously with progress reporting
+- Supports cancellation at any time
+- Cache is loaded on-demand and saved after each calculation
 
 ### Limitations
 
 - Only calculates folders (not individual files)
 - Requires manual trigger for each calculation
-- Column integration requires Windows Property System registration
-- Does not update automatically when folder contents change
+- Does not update automatically when folder contents change (must recalculate)
+- No Explorer column integration (registry-based approach limitation)
+- Requires administrator privileges for installation
 
-## Quick Access Toolbar Integration
+## Command Line Usage
 
-While true Quick Access Toolbar integration is complex in modern Windows (requires DeskBand implementation which is deprecated), you can achieve similar functionality by:
+You can also run the calculator directly from command line:
 
-1. **Pinning to Quick Access**: Create a shortcut that runs the calculation for frequently accessed folders
-2. **Keyboard Shortcuts**: Use context menu keyboard navigation (right-click + arrow keys)
-3. **Custom Toolbar**: Use third-party Explorer enhancement tools to add custom buttons
+```batch
+# Calculate single folder
+FolderSizeCalculator.exe "C:\Path\To\Folder"
+
+# Calculate all subfolders
+FolderSizeCalculator.exe "C:\Path\To\Folder" --subfolders
+```
 
 ## Troubleshooting
 
-### Extension doesn't appear in context menu
+### Context menu doesn't appear
 - Ensure you ran Install.bat as Administrator
 - Try restarting Windows Explorer: `taskkill /f /im explorer.exe && start explorer.exe`
-- Check COM registration: `regsvr32 /n /i:user "C:\Program Files\FolderSizeExtension\FolderSizeExtension.dll"`
+- Check if registry entries exist: Run `regedit` and navigate to `HKEY_CLASSES_ROOT\Directory\shell`
 
 ### Calculations are slow
 - This is expected for large folders with many files
-- You can cancel calculations at any time
+- You can cancel calculations at any time using the Cancel button
 - Consider calculating subfolders individually instead of all at once
+- Network drives and external drives may be slower
 
-### Tooltips don't show
-- Ensure you have calculated the folder size first
-- Hover for 1-2 seconds for tooltip to appear
-- Cache may be cleared - recalculate the folder
+### Application doesn't start
+- Ensure .NET 8 Runtime is installed: `dotnet --list-runtimes`
+- Check Windows Event Viewer for application errors
+- Verify application exists at `C:\Program Files\FolderSizeCalculator\FolderSizeCalculator.exe`
 
 ### Build errors
-- Ensure .NET 6.0 SDK is installed
+- Ensure .NET 8.0 SDK is installed: `dotnet --version` (should show 8.0.x)
 - Try restoring NuGet packages: `dotnet restore`
-- Check that SharpShell package is properly installed
+- Clean and rebuild: `dotnet clean && dotnet build -c Release`
 
 ## Development
 
 ### Project Structure
 
 ```
-FolderSizeExtension/
-├── FolderSizeExtension/          # Main project
-│   ├── Common/                   # Shared utilities
-│   ├── Properties/               # Assembly info and resources
-│   ├── ShellExtension/           # Shell extension handlers
-│   ├── FolderSizeCache.cs        # Caching system
-│   ├── FolderSizeCalculator.cs   # Calculation engine
-│   ├── FolderSizeCalculatorForm.cs  # Progress UI
-│   ├── FolderSizeColumnProvider.cs  # Column integration
-│   ├── FolderSizeContextMenu.cs     # Context menu
-│   └── FolderSizePropertyHandler.cs # Property handler
-├── Build.bat                     # Build script
-├── Install.bat                   # Installation script
-├── Uninstall.bat                 # Uninstallation script
-└── README.md                     # This file
+explorer-folder-size-extension/
+├── FolderSizeExtension/              # Main project
+│   ├── Properties/                   # Assembly info
+│   ├── FolderSizeCache.cs            # JSON-based caching system
+│   ├── FolderSizeCalculator.cs       # Async calculation engine
+│   ├── FolderSizeCalculatorForm.cs   # WinForms progress UI
+│   ├── FormatUtils.cs                # Formatting utilities
+│   ├── Program.cs                    # Application entry point
+│   ├── app.manifest                  # Windows application manifest
+│   └── FolderSizeExtension.csproj    # .NET 8 project file
+├── AddToContextMenu.reg              # Registry script (install)
+├── RemoveFromContextMenu.reg         # Registry script (uninstall)
+├── Build.bat                         # Build script
+├── Install.bat                       # Installation script
+├── Uninstall.bat                     # Uninstallation script
+├── FolderSizeExtension.sln           # Visual Studio solution
+└── README.md                         # This file
 ```
 
 ### Contributing
 
 Contributions are welcome! Please ensure:
-- Code follows existing style
+- Code follows existing style and C# conventions
 - Changes are tested on Windows 10 and 11
-- COM registration still works after changes
+- Registry integration remains functional after changes
+- Code is compatible with .NET 8
 
 ## License
 
@@ -193,16 +198,23 @@ This project is open source. See LICENSE file for details.
 ## Credits
 
 Built using:
-- [SharpShell](https://github.com/dwmkerr/sharpshell) - .NET Shell Extensions framework
-- .NET Framework 4.8 with Windows Forms
-- Windows Shell API
+- **.NET 8** - Latest LTS version of .NET
+- **Windows Forms** - Native Windows UI framework
+- **System.Text.Json** - Modern JSON serialization
+- **Windows Registry** - For context menu integration
 
 ## Version History
 
+### 2.0.0 (Current)
+- Migrated to .NET 8 (LTS)
+- Removed SharpShell dependency
+- Simplified architecture with registry-based context menu
+- Modern async/await patterns
+- Improved error handling
+- Self-contained executable approach
+
 ### 1.0.0
-- Initial release
-- Context menu integration
-- Folder size calculation
+- Initial release (.NET Framework 4.8)
+- COM-based shell extension
+- Basic folder size calculation
 - Persistent caching
-- Tooltip display
-- Progress tracking

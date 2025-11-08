@@ -21,15 +21,15 @@ echo Installing Folder Size Extension...
 echo.
 
 REM Set paths
-set INSTALL_DIR=%ProgramFiles%\FolderSizeExtension
-set DLL_NAME=FolderSizeExtension.dll
-set BUILD_DIR=%~dp0FolderSizeExtension\bin\Release\net48
+set INSTALL_DIR=%ProgramFiles%\FolderSizeCalculator
+set EXE_NAME=FolderSizeCalculator.exe
+set BUILD_DIR=%~dp0FolderSizeExtension\bin\Release\net8.0-windows
 
-REM Check if DLL exists
-if not exist "%BUILD_DIR%\%DLL_NAME%" (
-    echo ERROR: Extension DLL not found.
+REM Check if executable exists
+if not exist "%BUILD_DIR%\%EXE_NAME%" (
+    echo ERROR: Folder Size Calculator executable not found.
     echo Please build the project in Release mode first.
-    echo Expected location: %BUILD_DIR%\%DLL_NAME%
+    echo Expected location: %BUILD_DIR%\%EXE_NAME%
     pause
     exit /b 1
 )
@@ -39,25 +39,23 @@ echo Creating installation directory...
 if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%"
 
 REM Copy files
-echo Copying extension files...
+echo Copying application files...
 xcopy /Y /I "%BUILD_DIR%\*.*" "%INSTALL_DIR%\"
 
-REM Register the COM server using SharpShell
+REM Register context menu entries
 echo.
-echo Registering COM server...
-cd /d "%INSTALL_DIR%"
+echo Registering context menu entries...
+cd /d "%~dp0"
 
-REM Use regasm for .NET COM registration
-"%SystemRoot%\Microsoft.NET\Framework64\v4.0.30319\regasm.exe" /codebase "%INSTALL_DIR%\%DLL_NAME%"
+REM Import registry entries
+regedit /s AddToContextMenu.reg
 
 if %errorLevel% neq 0 (
-    echo ERROR: COM registration failed
+    echo ERROR: Registry import failed
+    echo You may need to manually import AddToContextMenu.reg
     pause
     exit /b 1
 )
-
-REM Alternatively, if SharpShell Server Registration Manager is available
-REM Use: srm install "%INSTALL_DIR%\%DLL_NAME%" -codebase
 
 echo.
 echo ========================================
@@ -69,9 +67,9 @@ echo.
 echo Usage:
 echo 1. Navigate to a folder in Windows Explorer
 echo 2. Right-click on any folder
-echo 3. Select "Calculate Folder Size" from the context menu
-echo 4. The size will be calculated and cached
-echo 5. Refresh the Explorer window (F5) to see the results in tooltips
+echo 3. Select "Calculate Folder Size" or "Calculate Folder Size (All Subfolders)"
+echo 4. A progress window will show calculation status
+echo 5. Results are cached for future reference
 echo.
 echo Note: You may need to restart Windows Explorer for changes to take effect.
 echo Press any key to restart Explorer now, or close this window to restart later.
