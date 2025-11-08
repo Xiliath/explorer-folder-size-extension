@@ -23,7 +23,7 @@ echo.
 REM Set paths
 set INSTALL_DIR=%ProgramFiles%\FolderSizeExtension
 set DLL_NAME=FolderSizeExtension.dll
-set BUILD_DIR=%~dp0FolderSizeExtension\bin\Release\net6.0-windows
+set BUILD_DIR=%~dp0FolderSizeExtension\bin\Release\net48
 
 REM Check if DLL exists
 if not exist "%BUILD_DIR%\%DLL_NAME%" (

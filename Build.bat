@@ -42,7 +42,7 @@ echo Build Complete!
 echo ========================================
 echo.
 echo The extension has been built successfully.
-echo Output location: FolderSizeExtension\bin\Release\net6.0-windows\
+echo Output location: FolderSizeExtension\bin\Release\net48\
 echo.
 echo Next steps:
 echo 1. Run Install.bat as Administrator to install the extension

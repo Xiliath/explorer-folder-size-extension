@@ -24,8 +24,8 @@ The extension consists of several components:
 
 ## Requirements
 
-- Windows 10 or later (x64)
-- .NET 6.0 Runtime or later
+- Windows 10 or later
+- .NET Framework 4.8 (pre-installed on Windows 10/11)
 - Administrator privileges for installation
 
 ## Building from Source
@@ -33,7 +33,7 @@ The extension consists of several components:
 ### Prerequisites
 
 - Visual Studio 2022 or later (with .NET desktop development workload)
-- .NET 6.0 SDK or later
+- .NET Framework 4.8 Developer Pack
 
 ### Build Steps
 
@@ -194,7 +194,7 @@ This project is open source. See LICENSE file for details.
 
 Built using:
 - [SharpShell](https://github.com/dwmkerr/sharpshell) - .NET Shell Extensions framework
-- .NET 6.0 Windows Forms
+- .NET Framework 4.8 with Windows Forms
 - Windows Shell API
 
 ## Version History
