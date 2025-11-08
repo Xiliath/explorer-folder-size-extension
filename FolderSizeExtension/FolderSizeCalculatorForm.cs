@@ -16,13 +16,13 @@ namespace FolderSizeExtension
         private readonly bool _includeSubfolders;
         private CancellationTokenSource? _cancellationTokenSource;
 
-        private Label _titleLabel;
-        private Label _currentFolderLabel;
-        private ProgressBar _progressBar;
-        private Label _statusLabel;
-        private Button _cancelButton;
-        private Button _closeButton;
-        private TextBox _resultsTextBox;
+        private Label _titleLabel = null!;
+        private Label _currentFolderLabel = null!;
+        private ProgressBar _progressBar = null!;
+        private Label _statusLabel = null!;
+        private Button _cancelButton = null!;
+        private Button _closeButton = null!;
+        private TextBox _resultsTextBox = null!;
 
         public FolderSizeCalculatorForm(string folderPath, bool includeSubfolders)
         {
@@ -166,7 +166,7 @@ namespace FolderSizeExtension
                 }
             });
 
-            var result = await FolderSizeCalculator.CalculateAsync(_folderPath, _cancellationTokenSource.Token, progress);
+            var result = await FolderSizeCalculator.CalculateAsync(_folderPath, _cancellationTokenSource!.Token, progress);
 
             if (result.WasCompleted)
             {
@@ -202,7 +202,7 @@ namespace FolderSizeExtension
                 _statusLabel.Text = $"Processed {completedCount} of {totalCount} folders...";
             });
 
-            await FolderSizeCalculator.CalculateSubfoldersAsync(_folderPath, progress, _cancellationTokenSource.Token);
+            await FolderSizeCalculator.CalculateSubfoldersAsync(_folderPath, progress, _cancellationTokenSource!.Token);
 
             _statusLabel.Text = $"Complete - {completedCount} folder(s) processed";
         }
